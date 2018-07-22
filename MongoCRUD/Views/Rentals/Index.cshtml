@@ -9,6 +9,8 @@
 {
     <label for="PriceLimit">Price Limit</label>
     <input type="text" name="PriceLimit" value="@Model.Filters.PriceLimit" />
+    <label for="MinimumRooms">Minimum Rooms</label>
+    <input type="text" name="MinimumRooms" value="@Model.Filters.MinimumRooms" />
     <input type="submit" value="Search" />
 }
 <p>
@@ -37,30 +39,31 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.Rentals) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NumberOfRooms)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Address)
-            </td>
-            <td>
-                @item.Adjustments.Select(a => a.Describe()).LastOrDefault()
-            </td>
-            <td>
-                @Html.ActionLink("Delete", "Delete", new { id= item.Id })
-            </td>
-            <td>
-                @Html.ActionLink("Adjust Price", "AdjustPrice", new { id = item.Id })
-            </td>
-        </tr>
-}
+        @foreach (var item in Model.Rentals)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NumberOfRooms)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Address)
+                </td>
+                <td>
+                    @item.Adjustments.Select(a => a.Describe()).LastOrDefault()
+                </td>
+                <td>
+                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                </td>
+                <td>
+                    @Html.ActionLink("Adjust Price", "AdjustPrice", new { id = item.Id })
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

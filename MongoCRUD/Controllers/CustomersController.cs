@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MongoCRUD.Data;
 using MongoCRUD.Models;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace MongoCRUD.Controllers
@@ -22,14 +23,16 @@ namespace MongoCRUD.Controllers
         // GET: Customers
         public ActionResult Index()
         {
-            var result = context.mongoDatabase.GetCollection<Customer>("Customers").Find(FilterDefinition<Customer>.Empty).ToList();
+            //var result = context.mongoDatabase.GetCollection<Customer>("Customers").Find(FilterDefinition<Customer>.Empty).ToList();
+            var result = context.mongoDatabase.GetCollection<Customer>("Customers")
+                .Find(new BsonDocument()).ToList();
+                
             return View(result);
         }
 
         // GET: Customers/Details/5
         public ActionResult Details(int id)
         {
-            
             var result = context.mongoDatabase.GetCollection<Customer>("Customers")
                 .Find<Customer>(c => c.CustomerId == id).FirstOrDefault();
             return View(result);

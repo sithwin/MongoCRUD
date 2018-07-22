@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MongoCRUD.Data;
 using MongoCRUD.Models;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace MongoCRUD.Controllers
@@ -15,30 +16,20 @@ namespace MongoCRUD.Controllers
         public readonly MongoContext context = new MongoContext();
 
         // GET: Rentals
-        public ActionResult Index(RentalsFilter filter)
+        public async Task<ActionResult> Index(RentalsFilter filter)
         {
-            var retntals = FilterRentals(filter);
+            var filterDefinition = filter.ToFilterDefinition(filter);
+
+            var rentals = await context.Rentals
+                .Find(filterDefinition)
+                .ToListAsync();
 
             var model = new RentalsList
             {
-                Rentals = retntals,
+                Rentals = rentals,
                 Filters = filter
             };
             return View(model);
-        }
-
-        private List<Rental> FilterRentals(RentalsFilter filters)
-        {
-            if (!filters.PriceLimit.HasValue)
-            {
-                return context.Rentals.Find(FilterDefinition<Rental>.Empty).SortBy(r => r.NumberOfRooms).ThenByDescending(r => r.Price
-                
-                ).ToList();
-            }
-            var filterBuilder = Builders<Rental>.Filter;
-            var query = filterBuilder.Lte(x => x.Price, filters.PriceLimit);
-            return context.Rentals.Find(query)
-                .SortBy(r => r.Price).ToList();
         }
 
         // GET: Rentals/Create
