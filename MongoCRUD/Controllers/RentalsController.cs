@@ -21,12 +21,6 @@ namespace MongoCRUD.Controllers
             return View(result);
         }
 
-        // GET: Rentals/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
-
         // GET: Rentals/Create
         public ActionResult Create()
         {
@@ -55,12 +49,10 @@ namespace MongoCRUD.Controllers
             Rental result = GetRental(id);
             return View(result);
         }
-
-        
+                
         [HttpPost]
         public ActionResult AdjustPrice(string id, AdjustPrice adjustPrice)
         {
-            
             var rental = GetRental(id);
             rental.AdjustPrice(adjustPrice);
             var result = context.Rentals.ReplaceOne(r => r.Id == new MongoDB.Bson.ObjectId(id), rental);
@@ -71,43 +63,19 @@ namespace MongoCRUD.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Rentals/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: Rentals/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                // TODO: Add update logic here
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
         // GET: Rentals/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
+        //public ActionResult Delete(string id)
+        //{
+
+        //    return View();
+        //}
 
         // POST: Rentals/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(string id)
         {
             try
             {
-                // TODO: Add delete logic here
-
+                context.Rentals.DeleteOne<Rental>(r => r.Id == new MongoDB.Bson.ObjectId(id));
                 return RedirectToAction(nameof(Index));
             }
             catch
