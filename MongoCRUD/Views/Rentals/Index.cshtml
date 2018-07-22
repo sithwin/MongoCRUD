@@ -31,9 +31,9 @@
             <th>
                 Address
             </th>
-            <th>
+            @*<th>
                 Last Adjustment
-            </th>
+            </th>*@
             <th></th>
             <th></th>
         </tr>
@@ -54,9 +54,9 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.Address)
                 </td>
-                <td>
+                @*<td>
                     @item.Adjustments.Select(a => a.Describe()).LastOrDefault()
-                </td>
+                </td>*@
                 <td>
                     @Html.ActionLink("Delete", "Delete", new { id = item.Id })
                 </td>

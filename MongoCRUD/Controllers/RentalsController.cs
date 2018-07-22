@@ -23,6 +23,15 @@ namespace MongoCRUD.Controllers
             var rentals = await context.Rentals
                 .Find(filterDefinition)
                 //.Sort(Builders<Rental>.Sort.Ascending(r => r.Price))
+                // Only Need below fields
+                .Project(r => new RentalViewModel
+                {
+                    Id = r.Id,
+                    Address = r.Address,
+                    NumberOfRooms = r.NumberOfRooms,
+                    Description = r.Description,
+                    Price = r.Price
+                })
                 .SortByDescending(r => r.Price)
                 .ThenBy(r => r.NumberOfRooms)
                 .ToListAsync();
@@ -44,12 +53,12 @@ namespace MongoCRUD.Controllers
         // POST: Rentals/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(PostRental postRental)
+        public async Task<ActionResult> Create(PostRental postRental)
         {
             try
             {
                 var rental = new Rental(postRental);
-                context.Rentals.InsertOne(rental);
+                await context.Rentals.InsertOneAsync(rental);
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -65,11 +74,12 @@ namespace MongoCRUD.Controllers
         }
                 
         [HttpPost]
-        public ActionResult AdjustPrice(string id, AdjustPrice adjustPrice)
+        public async Task<ActionResult> AdjustPrice(string id, AdjustPrice adjustPrice)
         {
             var rental = GetRental(id);
             rental.AdjustPrice(adjustPrice);
-            var result = context.Rentals.ReplaceOne(r => r.Id == new MongoDB.Bson.ObjectId(id), rental);
+            var result = await context.Rentals.ReplaceOneAsync(r => r.Id == new ObjectId(id), rental);
+
             if (result.IsAcknowledged == false)
             {
                 return BadRequest("unable to Adjust price " + rental.Price);
@@ -77,11 +87,44 @@ namespace MongoCRUD.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        public ActionResult Edit(string id)
+        {
+            Rental result = GetRental(id);
+            return View(result);
+        }
+
+        // UPDATE
+        //[HttpPost]
+        //public  ActionResult Edit(string id, PostRental postRental)
+        //{
+        //    var rental = GetRental(id);
+        //    var modifiedRental = Builders<Rental>.Update
+        //        .Set(r => r.Description, postRental.Description)
+        //        .Set(r => r.Price, postRental.Price)
+        //        .Set(r => r.NumberOfRooms, postRental.NumberOfRooms);
+        //    context.Rentals.UpdateOne(r => r.Id == new ObjectId(id), modifiedRental);
+        //    return RedirectToAction(nameof(Index));
+        //}
+
+        // Upsert
+        [HttpPost]
+        public ActionResult Edit(string id, PostRental postRental)
+        {
+            var rental = GetRental(id);
+            UpdateOptions options = new UpdateOptions
+            {
+                IsUpsert = true
+            };
+
+            context.Rentals.ReplaceOne(r => r.Id == new ObjectId(id), rental, options);
+            return RedirectToAction(nameof(Index));
+        }
+
         public ActionResult Delete(string id)
         {
             try
             {
-                context.Rentals.DeleteOne<Rental>(r => r.Id == new MongoDB.Bson.ObjectId(id));
+                context.Rentals.DeleteOne(r => r.Id == new ObjectId(id));
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -92,7 +135,9 @@ namespace MongoCRUD.Controllers
 
         private Rental GetRental(string id)
         {
-            return context.Rentals.Find<Rental>(r => r.Id == new MongoDB.Bson.ObjectId(id)).FirstOrDefault();
+            return context.Rentals
+                .Find(r => r.Id == new ObjectId(id))
+                .FirstOrDefault();
         }
 
     }
