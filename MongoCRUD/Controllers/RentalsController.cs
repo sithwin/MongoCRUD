@@ -18,6 +18,7 @@ namespace MongoCRUD.Controllers
         public ActionResult Index(RentalsFilter filter)
         {
             var retntals = FilterRentals(filter);
+
             var model = new RentalsList
             {
                 Rentals = retntals,
@@ -30,11 +31,14 @@ namespace MongoCRUD.Controllers
         {
             if (!filters.PriceLimit.HasValue)
             {
-                return context.Rentals.Find(FilterDefinition<Rental>.Empty).ToList();
+                return context.Rentals.Find(FilterDefinition<Rental>.Empty).SortBy(r => r.NumberOfRooms).ThenByDescending(r => r.Price
+                
+                ).ToList();
             }
             var filterBuilder = Builders<Rental>.Filter;
             var query = filterBuilder.Lte(x => x.Price, filters.PriceLimit);
-            return context.Rentals.Find(query).ToList();
+            return context.Rentals.Find(query)
+                .SortBy(r => r.Price).ToList();
         }
 
         // GET: Rentals/Create
