@@ -22,6 +22,9 @@ namespace MongoCRUD.Controllers
 
             var rentals = await context.Rentals
                 .Find(filterDefinition)
+                //.Sort(Builders<Rental>.Sort.Ascending(r => r.Price))
+                .SortByDescending(r => r.Price)
+                .ThenBy(r => r.NumberOfRooms)
                 .ToListAsync();
 
             var model = new RentalsList
