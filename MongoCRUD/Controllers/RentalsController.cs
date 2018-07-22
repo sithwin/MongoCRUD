@@ -50,6 +50,27 @@ namespace MongoCRUD.Controllers
             }
         }
 
+        public ActionResult AdjustPrice(string id)
+        {
+            Rental result = GetRental(id);
+            return View(result);
+        }
+
+        
+        [HttpPost]
+        public ActionResult AdjustPrice(string id, AdjustPrice adjustPrice)
+        {
+            
+            var rental = GetRental(id);
+            rental.AdjustPrice(adjustPrice);
+            var result = context.Rentals.ReplaceOne(r => r.Id == new MongoDB.Bson.ObjectId(id), rental);
+            if (result.IsAcknowledged == false)
+            {
+                return BadRequest("unable to Adjust price " + rental.Price);
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
         // GET: Rentals/Edit/5
         public ActionResult Edit(int id)
         {
@@ -64,7 +85,6 @@ namespace MongoCRUD.Controllers
             try
             {
                 // TODO: Add update logic here
-
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -95,5 +115,11 @@ namespace MongoCRUD.Controllers
                 return View();
             }
         }
+
+        private Rental GetRental(string id)
+        {
+            return context.Rentals.Find<Rental>(r => r.Id == new MongoDB.Bson.ObjectId(id)).FirstOrDefault();
+        }
+
     }
 }

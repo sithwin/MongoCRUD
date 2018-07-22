@@ -15,6 +15,8 @@ namespace MongoCRUD.Models
         public int NumberOfRooms { get; set; }
         public List<string> Address = new List<string>();
 
+        public List<PriceAdjustment> Adjustments = new List<PriceAdjustment>();
+
         [BsonRepresentation(BsonType.Double)]
         public decimal Price { get; set; }
 
@@ -29,6 +31,13 @@ namespace MongoCRUD.Models
             NumberOfRooms = postRental.NumberOfRooms;
             Price = postRental.Price;
             Address = (postRental.Address ?? string.Empty).Split('\n').ToList();
+        }
+
+        public void AdjustPrice (AdjustPrice adjustPrice)
+        {
+            var adjustment = new PriceAdjustment(adjustPrice, Price);
+            Adjustments.Add(adjustment);
+            Price = adjustPrice.NewPrice;
         }
     }
 }
