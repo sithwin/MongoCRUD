@@ -15,10 +15,26 @@ namespace MongoCRUD.Controllers
         public readonly MongoContext context = new MongoContext();
 
         // GET: Rentals
-        public ActionResult Index()
+        public ActionResult Index(RentalsFilter filter)
         {
-            var result = context.Rentals.Find(FilterDefinition<Rental>.Empty).ToList();
-            return View(result);
+            var retntals = FilterRentals(filter);
+            var model = new RentalsList
+            {
+                Rentals = retntals,
+                Filters = filter
+            };
+            return View(model);
+        }
+
+        private List<Rental> FilterRentals(RentalsFilter filters)
+        {
+            if (!filters.PriceLimit.HasValue)
+            {
+                return context.Rentals.Find(FilterDefinition<Rental>.Empty).ToList();
+            }
+            var filterBuilder = Builders<Rental>.Filter;
+            var query = filterBuilder.Lte(x => x.Price, filters.PriceLimit);
+            return context.Rentals.Find(query).ToList();
         }
 
         // GET: Rentals/Create
@@ -63,14 +79,6 @@ namespace MongoCRUD.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Rentals/Delete/5
-        //public ActionResult Delete(string id)
-        //{
-
-        //    return View();
-        //}
-
-        // POST: Rentals/Delete/5
         public ActionResult Delete(string id)
         {
             try

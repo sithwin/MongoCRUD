@@ -1,11 +1,16 @@
-﻿@model IEnumerable<MongoCRUD.Models.Rental>
+﻿@model MongoCRUD.Models.RentalsList
 
 @{
     ViewData["Title"] = "Index";
 }
 
-<h2>Index</h2>
-
+<h2>Rental Listings</h2>
+@using (Html.BeginForm())
+{
+    <label for="PriceLimit">Price Limit</label>
+    <input type="text" name="PriceLimit" value="@Model.Filters.PriceLimit" />
+    <input type="submit" value="Search" />
+}
 <p>
     <a asp-action="Create">Create New</a>
 </p>
@@ -13,16 +18,16 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Description)
+                Description
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.NumberOfRooms)
+                Number Of Rooms
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Price)
+                Price
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Address)
+                Address
             </th>
             <th>
                 Last Adjustment
@@ -32,7 +37,7 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var item in Model.Rentals) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Description)
