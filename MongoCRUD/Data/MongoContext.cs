@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using MongoCRUD.Models;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,13 @@ namespace MongoCRUD.Data
         {
             var mongoCleint = new MongoClient("mongodb://localhost:27017");
             mongoDatabase = mongoCleint.GetDatabase("CustomerDB");
+        }
+
+        public IMongoCollection<Rental> Rentals {
+            get
+            {
+                return mongoDatabase.GetCollection<Rental>("Rentals");
+            }
         }
     }
 }
